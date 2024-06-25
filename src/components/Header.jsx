@@ -1,12 +1,31 @@
-import {Image, StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, { useState } from 'react';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
 
-const Header = () => {
+const Header = ({isCart}) => {
+  const navigation = useNavigation();
   return (
     <View style={styles.container}>
-      <View style={styles.appIconContainer}>
-        <Image source={require('../assets/icon.png')} style={styles.appIcon} />
-      </View>
+      <TouchableOpacity 
+      onPress={()=>navigation.navigate("HOME_STACK")}
+      style={styles.appIconContainer}
+      >
+        {isCart ? (
+          <Ionicons
+            name="chevron-back"
+            size={24}
+            style={styles.backIcon}
+            color="#E96E6E"
+          />
+        ) : (
+          <Image
+            source={require('../assets/icon.png')}
+            style={styles.appIcon}
+          />
+        )}
+      </TouchableOpacity>
+      <Text style={styles.myCart}>My Cart</Text>
       <Image
         source={require('../assets/woman.png')}
         style={styles.profilePhoto}
@@ -44,5 +63,10 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  myCart:{
+    fontSize:28,
+    fontWeight:"500",
+    color:"#000"
   },
 });

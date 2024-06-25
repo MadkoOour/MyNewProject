@@ -5,8 +5,9 @@ import { useNavigation } from '@react-navigation/native';
 
 const ProductCard = ({item , handleLiked}) => {
   const navigate = useNavigation();
+  // console.log({item},"**********************",item)
   return (
-    <TouchableOpacity style={styles.container} onPress={()=>navigate.navigate("PRODUCT_DETAILS",{id: item.id,})}>
+    <TouchableOpacity style={styles.container} onPress={()=>navigate.navigate("PRODUCT_DETAILS",{item})}>
       <Image
         source={{uri:item.image}}
         style={styles.coverImage}
