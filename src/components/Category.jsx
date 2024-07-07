@@ -1,9 +1,18 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 
-const Category = ({item, selectedCategory, setSelectedCategory}) => {
+const Category = ({
+  item,
+  selectedCategory,
+  setSelectedCategory,
+  handleCategory,
+}) => {
   return (
-    <TouchableOpacity onPress={() => setSelectedCategory(item)}>
+    <TouchableOpacity
+      onPress={() => {
+        setSelectedCategory(item);
+        handleCategory(item);
+      }}>
       <Text
         style={[
           styles.categoryText,

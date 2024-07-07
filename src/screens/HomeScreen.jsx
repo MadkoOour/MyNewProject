@@ -1,19 +1,45 @@
-import {FlatList, StyleSheet, Text, TextInput, View} from 'react-native';
+import { FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import React, {useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import Category from '../components/Category';
 import ProductCard from '../components/ProductCard';
-import data from '../data/data.json';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchProducts, setProducts } from '../app/reducers/ProductsSlice';
+import { fetchCategories } from '../app/reducers/CategoriesSlice';
 
-const categories = ['Trending Now', 'All', 'New', 'Men', 'Women'];
 export default function HomeScreen() {
-  const [selectedCategory, setSelectedCategory] = useState('Trending Now');
-  const [isLiked, setIsLiked] = useState(false);
-  const [products, setProducts] = useState(data.products);
+  const dispatch = useDispatch();
+  
+  const products = useSelector(state => state.products);
+  const categories = useSelector(state => state.categories);
+  
+  const [fetchedProducts, setFetchedProducts] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+
+  // Fetching data
+  useEffect(() => {
+    const fetchData = async () => {
+      const productsAction = await dispatch(fetchProducts());
+      setFetchedProducts(productsAction.payload);
+      dispatch(fetchCategories());
+    };
+
+    fetchData();
+  }, [dispatch]);
+
+  const handleCategory = category => {
+    setSelectedCategory(category);
+    if (category === 'All') {
+      dispatch(setProducts(fetchedProducts));
+    } else {
+      const filteredProducts = fetchedProducts.filter(prod => prod.category === category.toLowerCase());
+      dispatch(setProducts(filteredProducts));
+    }
+  };
+
   const handleLiked = item => {
-    // console.log("item num "+item.id+" clicked!");
     const favProducts = products.map(product => {
       if (item.id === product.id) {
         return {
@@ -23,44 +49,37 @@ export default function HomeScreen() {
       }
       return product;
     });
-    setProducts(favProducts)
+    dispatch(setProducts(favProducts));
   };
+
   return (
     <LinearGradient colors={['#FDF0F3', '#FFFBFC']} style={styles.container}>
-      {/* header */}
       <Header />
-
-      {/* product List */}
       <FlatList
         data={products}
-        renderItem={({item, index}) => (
+        renderItem={({ item, index }) => (
           <ProductCard item={item} handleLiked={handleLiked} />
         )}
         numColumns={2}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingBottom: 50,
-        }}
+        contentContainerStyle={{ paddingBottom: 50 }}
         ListHeaderComponent={
           <>
             <Text style={styles.headerText}>Match Your Style</Text>
-
-            {/* input container */}
             <View style={styles.inputContainer}>
               <View style={styles.iconContainer}>
                 <Fontisto name={'search'} size={26} color={'#c0c0c0'} />
               </View>
               <TextInput style={styles.textInput} placeholder="Search" />
             </View>
-
-            {/* category section */}
             <FlatList
               data={categories}
-              renderItem={({item}) => (
+              renderItem={({ item }) => (
                 <Category
                   item={item}
                   selectedCategory={selectedCategory}
                   setSelectedCategory={setSelectedCategory}
+                  handleCategory={handleCategory}
                 />
               )}
               keyExtractor={item => item}
@@ -76,9 +95,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
     padding: 20,
-    // margin:20,
     backgroundColor: '#FDF0F3',
   },
   headerText: {

@@ -9,7 +9,7 @@ import {
 import React, {useState} from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import Header from '../components/Header';
-import {useRoute} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 const ProductDetailsScreen = () => {
   const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
@@ -22,7 +22,7 @@ const ProductDetailsScreen = () => {
     '#000000',
   ];
   const route = useRoute();
-  // console.log(route.params.item);
+  // console.log(route.params);
   const item = route.params.item
   const [selectedSize, setSelectedSize] = useState('L');
   const [selectedColor, setSelectedColor] = useState(null);
@@ -71,7 +71,7 @@ const ProductDetailsScreen = () => {
             <View
               style={[
                 styles.circleBorder,
-                selectedColor === color && {borderColor: color, borderWidth: 2},
+                selectedColor === color && {borderColor: color, borderWidth: 2 ,borderRadius:50},
               ]}
               key={color}>
               <TouchableOpacity

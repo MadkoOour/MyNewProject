@@ -18,6 +18,7 @@ const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 function Home() {
+  console.log("Hello from Home!")
   return (
     <View>
       <Text>Hello from Home</Text>
@@ -43,7 +44,7 @@ export default function App() {
           tabBarShowLabel: false,
           tabBarActiveTintColor:"#E96E6E"
         }}
-        initialRouteName='CART'
+        // initialRouteName='CART'
         >
         <Tab.Screen
           name="HOME_STACK"
