@@ -8,11 +8,12 @@ import ProductCard from '../components/ProductCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProducts, setProducts } from '../app/reducers/ProductsSlice';
 import { fetchCategories } from '../app/reducers/CategoriesSlice';
-
+// import data from "../data/data.json"
 export default function HomeScreen() {
   const dispatch = useDispatch();
   
   const products = useSelector(state => state.products);
+  // console.log("🚀 ~ HomeScreen ~ products:", products)
   const categories = useSelector(state => state.categories);
   
   const [fetchedProducts, setFetchedProducts] = useState([]);

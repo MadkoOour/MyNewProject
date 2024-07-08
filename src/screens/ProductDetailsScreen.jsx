@@ -10,6 +10,8 @@ import React, {useState} from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import Header from '../components/Header';
 import {useNavigation, useRoute} from '@react-navigation/native';
+import {useDispatch} from 'react-redux';
+import {add_product} from '../app/reducers/CartSlice';
 
 const ProductDetailsScreen = () => {
   const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
@@ -23,9 +25,12 @@ const ProductDetailsScreen = () => {
   ];
   const route = useRoute();
   // console.log(route.params);
-  const item = route.params.item
+  const item = route.params.item;
   const [selectedSize, setSelectedSize] = useState('L');
-  const [selectedColor, setSelectedColor] = useState(null);
+  const [selectedColor, setSelectedColor] = useState('#9F632A');
+  const fullItem = {...item, color: selectedColor, size: selectedSize};
+  // console.log("🚀 ~ ProductDetailsScreen ~ fullItem:", fullItem.color)
+  const dispatch = useDispatch();
   return (
     <LinearGradient colors={['#FDF0F3', '#FFFBFC']} style={styles.container}>
       <ScrollView>
@@ -71,7 +76,11 @@ const ProductDetailsScreen = () => {
             <View
               style={[
                 styles.circleBorder,
-                selectedColor === color && {borderColor: color, borderWidth: 2 ,borderRadius:50},
+                selectedColor === color && {
+                  borderColor: color,
+                  borderWidth: 2,
+                  borderRadius: 50,
+                },
               ]}
               key={color}>
               <TouchableOpacity
@@ -82,7 +91,12 @@ const ProductDetailsScreen = () => {
           ))}
         </View>
 
-        <TouchableOpacity title="Add to Cart" style={styles.button}>
+        <TouchableOpacity
+          title="Add to Cart"
+          style={styles.button}
+          onPress={() => {
+            dispatch(add_product(fullItem));
+          }}>
           <Text style={styles.buttonText}>Add to Cart</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -102,10 +116,10 @@ const styles = StyleSheet.create({
   },
   coverImage: {
     width: '100%',
-    marginHorizontal:'auto',
+    marginHorizontal: 'auto',
     height: 420,
-    borderRadius:50,
-    aspectRatio:6/8,
+    borderRadius: 50,
+    aspectRatio: 6 / 8,
   },
   contentContainer: {
     flexDirection: 'row',

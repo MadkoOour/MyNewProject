@@ -3,45 +3,75 @@ import React from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import Header from '../components/Header';
 import CartCard from '../components/CartCard';
+import {useDispatch, useSelector} from 'react-redux';
+import {reset_cart} from '../app/reducers/CartSlice';
 
 const CartScreen = () => {
+  const dispatch = useDispatch();
+  const cart = useSelector(state => state.cart);
+
+  const calculateTotalAmount = () => {
+    if (cart && cart.length > 0) {
+      const total = cart
+        .reduce((sum, prod) => sum + prod.amount * prod.price, 0)
+        .toFixed(2);
+      return parseFloat(total); // Convert to number
+    }
+    return 0;
+  };
+
+  const totalAmount = calculateTotalAmount();
+  const shippingCost = 50;
+  const grandTotal = totalAmount > 0 ? totalAmount + shippingCost : 0;
+
   return (
     <LinearGradient colors={['#FDF0F3', '#FFFBFC']} style={styles.container}>
       <View style={styles.headerContainer}>
         <Header isCart={true} />
       </View>
-      {/* <CartCard />
-      <CartCard /> */}
       <FlatList
-        data={[1, 2, 3, 4, 5]}
-        renderItem={CartCard}
+        data={cart}
+        renderItem={({item}) => <CartCard item={item} />}
         ListFooterComponent={
           <>
-            {/* price info */}
             <View style={styles.priceAndTitleContainer}>
               <View style={styles.priceContainer}>
                 <Text style={styles.text}>Total :</Text>
-                <Text style={[styles.text, styles.textPrice]}>$119.7</Text>
+                <Text style={[styles.text, styles.textPrice]}>
+                  ${totalAmount.toFixed(2)}
+                </Text>
               </View>
               <View style={styles.shippingContainer}>
                 <Text style={styles.text}>Shipping :</Text>
-                <Text style={[styles.text, styles.textPrice]}>$0.0</Text>
+                <Text style={[styles.text, styles.textPrice]}>
+                  ${shippingCost.toFixed(2)}
+                </Text>
               </View>
             </View>
             <View style={styles.divider} />
             <View style={styles.shippingContainer}>
               <Text style={styles.text}>Grand Total:</Text>
-              <Text style={[styles.text, styles.textGrandPrice]}>$119.7</Text>
+              <Text style={[styles.text, styles.textGrandPrice]}>
+                ${grandTotal.toFixed(2)}
+              </Text>
             </View>
           </>
         }
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{paddingBottom:15}}
+        contentContainerStyle={{paddingBottom: 15}}
       />
-
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Checkout</Text>
-      </TouchableOpacity>
+      <View style={styles.actions}>
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Checkout</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            dispatch(reset_cart());
+          }}>
+          <Text style={styles.buttonText}>Reset</Text>
+        </TouchableOpacity>
+      </View>
     </LinearGradient>
   );
 };
@@ -92,9 +122,9 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   button: {
-    width: '100%',
+    width: '45%',
     marginHorizontal: 'auto',
-    marginVertical:20,
+    marginVertical: 20,
     paddingVertical: 10,
     backgroundColor: '#E96E6E',
     borderRadius: 20,
@@ -105,5 +135,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '600',
     color: '#FFF',
+  },
+  actions: {
+    flexDirection: 'row',
   },
 });
