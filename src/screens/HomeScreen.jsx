@@ -1,23 +1,24 @@
-import { FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
+import {FlatList, StyleSheet, Text, TextInput, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Header from '../components/Header';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import Category from '../components/Category';
 import ProductCard from '../components/ProductCard';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts, setProducts } from '../app/reducers/ProductsSlice';
-import { fetchCategories } from '../app/reducers/CategoriesSlice';
-// import data from "../data/data.json"
+import {useDispatch, useSelector} from 'react-redux';
+import {fetchProducts, setProducts} from '../app/reducers/ProductsSlice';
+import {fetchCategories} from '../app/reducers/CategoriesSlice';
 export default function HomeScreen() {
   const dispatch = useDispatch();
-  
+
   const products = useSelector(state => state.products);
   // console.log("🚀 ~ HomeScreen ~ products:", products)
   const categories = useSelector(state => state.categories);
-  
+
   const [fetchedProducts, setFetchedProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchObj, setSearchObj] = useState('');
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
   // Fetching data
   useEffect(() => {
@@ -26,16 +27,30 @@ export default function HomeScreen() {
       setFetchedProducts(productsAction.payload);
       dispatch(fetchCategories());
     };
-
     fetchData();
   }, [dispatch]);
+
+  // Filter products based on search query
+  useEffect(() => {
+    if (searchObj === '') {
+      setFilteredProducts(products);
+    } else {
+      const filtered = products.filter(product =>
+        product?.title?.toLowerCase().includes(searchObj.toLowerCase()),
+      );
+      console.log('🚀 ~ useEffect ~ filtered:', filtered);
+      setFilteredProducts(filtered);
+    }
+  }, [searchObj, products]);
 
   const handleCategory = category => {
     setSelectedCategory(category);
     if (category === 'All') {
       dispatch(setProducts(fetchedProducts));
     } else {
-      const filteredProducts = fetchedProducts.filter(prod => prod.category === category.toLowerCase());
+      const filteredProducts = fetchedProducts.filter(
+        prod => prod.category === category.toLowerCase(),
+      );
       dispatch(setProducts(filteredProducts));
     }
   };
@@ -57,13 +72,13 @@ export default function HomeScreen() {
     <LinearGradient colors={['#FDF0F3', '#FFFBFC']} style={styles.container}>
       <Header />
       <FlatList
-        data={products}
-        renderItem={({ item, index }) => (
+        data={filteredProducts}
+        renderItem={({item, index}) => (
           <ProductCard item={item} handleLiked={handleLiked} />
         )}
         numColumns={2}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 50 }}
+        contentContainerStyle={{paddingBottom: 50}}
         ListHeaderComponent={
           <>
             <Text style={styles.headerText}>Match Your Style</Text>
@@ -71,11 +86,16 @@ export default function HomeScreen() {
               <View style={styles.iconContainer}>
                 <Fontisto name={'search'} size={26} color={'#c0c0c0'} />
               </View>
-              <TextInput style={styles.textInput} placeholder="Search" />
+              <TextInput
+                style={styles.textInput}
+                placeholder="Search"
+                value={searchObj}
+                onChangeText={e => setSearchObj(e)}
+              />
             </View>
             <FlatList
               data={categories}
-              renderItem={({ item }) => (
+              renderItem={({item}) => (
                 <Category
                   item={item}
                   selectedCategory={selectedCategory}
